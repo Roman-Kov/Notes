@@ -1,4 +1,3 @@
-package com.rojer_ko.notes.data
+package com.rojer_ko.notes.data.model
 
-class Note {
-}
+data class Note (val title: String, val note: String, val color: Int)
