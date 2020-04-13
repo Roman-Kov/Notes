@@ -1,4 +1,4 @@
-package com.rojer_ko.notes.presentation
+package com.rojer_ko.notes.presentation.ui.main
 
 import android.view.LayoutInflater
 import android.view.View

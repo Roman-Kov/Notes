@@ -1,11 +1,14 @@
 package com.rojer_ko.notes.data.repository
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.rojer_ko.notes.data.model.Color
 import com.rojer_ko.notes.data.model.Note
 
 object NoteRepository {
 
-    val notes: List<Note> = listOf(
+    private val notesLiveData = MutableLiveData<List<Note>>()
+    val notes: MutableList<Note> = mutableListOf(
         Note(title =  "Заметка № 1",
             note = "Kotlin очень краткий, но при этом выразительный язык",
             color = Color.YELLOW),
@@ -37,4 +40,30 @@ object NoteRepository {
             note = "В Android Studio можно посмотреть байт-код, в который компилируется ваш код, написанный на Kotlin",
             color = Color.BLUE)
     )
+
+    init {
+        notesLiveData.value = notes
+    }
+
+    fun getNotes(): LiveData<List<Note>> {
+        return notesLiveData
+    }
+
+    fun saveNote(note: Note) {
+        addOrReplace(note)
+        notesLiveData.value = notes
+    }
+
+    private fun addOrReplace(note: Note) {
+
+        for (i in 0 until notes.size) {
+            if (notes[i] == note) {
+                notes.set(i, note)
+                return
+            }
+        }
+
+        notes.add(note)
+    }
+
 }

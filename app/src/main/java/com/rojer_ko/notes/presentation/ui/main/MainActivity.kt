@@ -1,4 +1,4 @@
-package com.rojer_ko.notes.presentation
+package com.rojer_ko.notes.presentation.ui.main
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -6,6 +6,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.rojer_ko.notes.R
 import com.rojer_ko.notes.data.model.Note
+import com.rojer_ko.notes.presentation.ui.note.NoteActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -18,7 +19,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
         viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
-        adapter = MainAdapter( object : MainAdapter.OnItemClickListener {
+        adapter = MainAdapter(object :
+            MainAdapter.OnItemClickListener {
             override fun onItemClick(note: Note) {
                 openNoteScreen(note)
             }
@@ -31,7 +33,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openNoteScreen(note: Note?) {
-        val intent = NoteActivity.getStartIntent(this, note)
+        val intent =
+            NoteActivity.getStartIntent(
+                this,
+                note
+            )
         startActivity(intent)
     }
 }

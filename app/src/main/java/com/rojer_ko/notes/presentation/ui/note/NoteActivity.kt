@@ -1,22 +1,25 @@
-package com.rojer_ko.notes.presentation
+package com.rojer_ko.notes.presentation.ui.note
 
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.Handler
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProviders
 import com.rojer_ko.notes.R
 import com.rojer_ko.notes.data.model.Color
 import com.rojer_ko.notes.data.model.Note
 import com.rojer_ko.notes.presentation.extensions.DATE_TIME_FORMAT
+import com.rojer_ko.notes.presentation.extensions.SAVE_DELAY
 import kotlinx.android.synthetic.main.activity_note.*
 import java.text.SimpleDateFormat
 import java.util.*
 
 class NoteActivity : AppCompatActivity() {
-
 
     companion object {
         private val EXTRA_NOTE = NoteActivity::class.java.name + "extra.NOTE"
@@ -29,6 +32,7 @@ class NoteActivity : AppCompatActivity() {
     }
 
     private var note: Note? = null
+    private lateinit var viewModel: NoteViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,8 +52,13 @@ class NoteActivity : AppCompatActivity() {
 
         initView()
     }
+
     private fun initView() {
         if (note != null) {
+            viewModel = ViewModelProviders.of(this).get(NoteViewModel::class.java)
+            titleEt.addTextChangedListener(textChangeListener)
+            bodyEt.addTextChangedListener(textChangeListener)
+
             titleEt.setText(note?.title ?: "")
             bodyEt.setText(note?.note ?: "")
             val color = when(note!!.color) {
@@ -72,6 +81,36 @@ class NoteActivity : AppCompatActivity() {
             true
         }
         else -> super.onOptionsItemSelected(item)
+    }
+
+    private val textChangeListener = object : TextWatcher {
+        override fun afterTextChanged(s: Editable?) {
+            triggerSaveNote()
+        }
+
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            // not used
+        }
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            // not used
+        }
+    }
+
+
+    private fun triggerSaveNote() {
+        if (titleEt.text == null || titleEt.text!!.length < 3) return
+
+        Handler().postDelayed(object : Runnable {
+            override fun run() {
+                note = note?.copy(title = titleEt.text.toString(),
+                    note = bodyEt.text.toString(),
+                    lastChanged = Date())
+
+                if (note != null) viewModel.saveChanges(note!!)
+            }
+
+        }, SAVE_DELAY)
     }
 }
 
