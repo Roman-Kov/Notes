@@ -30,6 +30,8 @@ class MainActivity : AppCompatActivity() {
         viewModel.viewState().observe(this, Observer<MainViewState> { t ->
             t?.let { adapter.notes = it.notes }
         })
+
+        fab.setOnClickListener { openNoteScreen(null) }
     }
 
     private fun openNoteScreen(note: Note?) {
@@ -40,4 +42,5 @@ class MainActivity : AppCompatActivity() {
             )
         startActivity(intent)
     }
+
 }
