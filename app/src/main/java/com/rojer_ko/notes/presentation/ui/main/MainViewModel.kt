@@ -1,20 +1,38 @@
-package com.rojer_ko.notes.presentation.ui.main
+import androidx.lifecycle.Observer
+import com.rojer_ko.notes.data.model.Note
+import com.rojer_ko.notes.data.model.NoteResult
+import com.rojer_ko.notes.data.model.NoteResult.*
+import com.rojer_ko.notes.data.repository.Repository
+import com.rojer_ko.notes.presentation.ui.base.BaseViewModel
+import com.rojer_ko.notes.presentation.ui.main.MainViewState
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.rojer_ko.notes.data.repository.NoteRepository
+class MainViewModel(val repository: Repository = Repository) : BaseViewModel<List<Note>?, MainViewState>() {
 
-class MainViewModel: ViewModel() {
+    private val notesObserver = object : Observer<NoteResult> {//Стандартный обсервер LiveData
+    override fun onChanged(t: NoteResult?) {
+        if (t == null) return
 
-    private val viewStateLiveData: MutableLiveData<MainViewState> = MutableLiveData()
-
-    init {
-        NoteRepository.getNotes().observeForever {
-            viewStateLiveData.value =
-                viewStateLiveData.value?.copy(notes = it!!) ?: MainViewState(it!!)
+        when(t) {
+            is Success<*> -> {
+// Может понадобиться вручную импортировать класс data.model.NoteResult.Success
+                viewStateLiveData.value = MainViewState(notes = t.data as? List<Note>)
+            }
+            is Error -> {
+// Может понадобиться вручную импортировать класс data.model.NoteResult.Error
+                viewStateLiveData.value = MainViewState(error = t.error)
+            }
         }
     }
+    }
 
-    fun viewState(): LiveData<MainViewState> = viewStateLiveData
+    private val repositoryNotes = repository.getNotes()
+
+    init {
+        viewStateLiveData.value = MainViewState()
+        repositoryNotes.observeForever(notesObserver)
+    }
+
+    override fun onCleared() {
+        repositoryNotes.removeObserver(notesObserver)
+    }
 }

@@ -5,8 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.rojer_ko.notes.data.model.Color
 import com.rojer_ko.notes.data.model.Note
 
-object NoteRepository {
-
+object LocalRepository {
     private val notesLiveData = MutableLiveData<List<Note>>()
     val notes: MutableList<Note> = mutableListOf(
         Note(title =  "Заметка № 1",
@@ -65,5 +64,4 @@ object NoteRepository {
 
         notes.add(note)
     }
-
 }

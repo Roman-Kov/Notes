@@ -1,68 +1,66 @@
 package com.rojer_ko.notes.presentation.ui.note
 
+import NoteViewModel
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.text.Editable
-import android.text.TextWatcher
 import android.view.MenuItem
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.rojer_ko.notes.R
 import com.rojer_ko.notes.data.model.Color
 import com.rojer_ko.notes.data.model.Note
 import com.rojer_ko.notes.presentation.extensions.DATE_TIME_FORMAT
 import com.rojer_ko.notes.presentation.extensions.SAVE_DELAY
+import com.rojer_ko.notes.presentation.ui.base.BaseActivity
 import com.rojer_ko.notes.presentation.ui.common.MyTextWatcher
 import kotlinx.android.synthetic.main.activity_note.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class NoteActivity : AppCompatActivity() {
+class NoteActivity : BaseActivity<Note?, NoteViewState>() {
 
     companion object {
         private val EXTRA_NOTE = NoteActivity::class.java.name + "extra.NOTE"
-
-        fun getStartIntent(context: Context, note: Note?): Intent {
+        fun getStartIntent(context: Context, noteId: String?): Intent {
             val intent = Intent(context, NoteActivity::class.java)
-            intent.putExtra(EXTRA_NOTE, note)
+            intent.putExtra(EXTRA_NOTE, noteId)
             return intent
         }
     }
 
+    override val viewModel: NoteViewModel by lazy { ViewModelProviders.of(this).get(NoteViewModel::class.java) }
+    override val layoutRes: Int = R.layout.activity_note
     private var note: Note? = null
-    private lateinit var viewModel: NoteViewModel
+    private var noteId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_note)
 
-        note = intent.getParcelableExtra(EXTRA_NOTE)
-
+        noteId = intent.getStringExtra(EXTRA_NOTE)
+        noteId?.let {
+            viewModel.loadNote(it)
+        }
         initActionBar()
-        initView()
+        titleEt.addTextChangedListener(textChangeListener)
+        bodyEt.addTextChangedListener(textChangeListener)
     }
+
+    override fun renderData(data: Note?) {
+        this.note = data
+        initView()
+}
 
     private fun initActionBar(){
         setSupportActionBar(note_toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = if (note != null) {
-            SimpleDateFormat(DATE_TIME_FORMAT,
-                Locale.getDefault()).format(note!!.lastChanged)
-        } else {
-            getString(R.string.new_note_title)
-        }
+        if (noteId == null ) supportActionBar?.title = getString(R.string.new_note_title)
     }
 
     private fun initView() {
-        viewModel = ViewModelProviders.of(this).get(NoteViewModel::class.java)
-        titleEt.addTextChangedListener(textChangeListener)
-        bodyEt.addTextChangedListener(textChangeListener)
-
-        if (note != null) {
+            if (note != null) {
             titleEt.setText(note?.title ?: "")
             bodyEt.setText(note?.note ?: "")
             val color = when(note!!.color) {
@@ -74,7 +72,6 @@ class NoteActivity : AppCompatActivity() {
                 Color.GREEN -> this.resources.getColor(R.color.color_green)
                 Color.BLUE -> this.resources.getColor(R.color.color_blue)
             }
-
             this.supportActionBar?.setBackgroundDrawable(ColorDrawable(color))
         }
     }
@@ -100,13 +97,11 @@ class NoteActivity : AppCompatActivity() {
 
     private fun triggerSaveNote() {
         if (titleEt.text!!.length < 3) return
-
         Handler().postDelayed({
             note = note?.copy(title = titleEt.text.toString(),
                 note = bodyEt.text.toString(),
                 lastChanged = Date())
                 ?: createNewNote()
-
             if (note != null) viewModel.saveChanges(note!!)
         }, SAVE_DELAY)
     }
