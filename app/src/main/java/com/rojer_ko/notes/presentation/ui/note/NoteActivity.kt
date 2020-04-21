@@ -10,14 +10,13 @@ import android.text.Editable
 import android.view.MenuItem
 import androidx.lifecycle.ViewModelProviders
 import com.rojer_ko.notes.R
-import com.rojer_ko.notes.data.model.Color
 import com.rojer_ko.notes.data.model.Note
-import com.rojer_ko.notes.presentation.extensions.DATE_TIME_FORMAT
 import com.rojer_ko.notes.presentation.extensions.SAVE_DELAY
+import com.rojer_ko.notes.presentation.extensions.format
+import com.rojer_ko.notes.presentation.extensions.getColorInt
 import com.rojer_ko.notes.presentation.ui.base.BaseActivity
 import com.rojer_ko.notes.presentation.ui.common.MyTextWatcher
 import kotlinx.android.synthetic.main.activity_note.*
-import java.text.SimpleDateFormat
 import java.util.*
 
 class NoteActivity : BaseActivity<Note?, NoteViewState>() {
@@ -60,19 +59,11 @@ class NoteActivity : BaseActivity<Note?, NoteViewState>() {
     }
 
     private fun initView() {
-            if (note != null) {
-            titleEt.setText(note?.title ?: "")
-            bodyEt.setText(note?.note ?: "")
-            val color = when(note!!.color) {
-                Color.WHITE -> this.resources.getColor(R.color.color_white)
-                Color.VIOLET -> this.resources.getColor(R.color.color_violet)
-                Color.YELLOW -> this.resources.getColor(R.color.color_yello)
-                Color.RED -> this.resources.getColor(R.color.color_red)
-                Color.PINK -> this.resources.getColor(R.color.color_pink)
-                Color.GREEN -> this.resources.getColor(R.color.color_green)
-                Color.BLUE -> this.resources.getColor(R.color.color_blue)
-            }
-            this.supportActionBar?.setBackgroundDrawable(ColorDrawable(color))
+        note?.run {
+            supportActionBar?.title = lastChanged.format()
+            titleEt.setText(this.title)
+            bodyEt.setText(this.note)
+            supportActionBar?.setBackgroundDrawable(ColorDrawable(color.getColorInt(this@NoteActivity)))
         }
     }
 
