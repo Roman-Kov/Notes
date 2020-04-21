@@ -4,12 +4,11 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 import java.util.*
 
-
 @Parcelize
 data class Note(val id: String = UUID.randomUUID().toString(),
                 val title: String = "",
                 val note: String = "",
-                val color: Color = Color.WHITE,
+                val color: Color = Color.values()[(0 .. Color.values().size -1).random()],
                 val lastChanged: Date = Date()): Parcelable {
 
     override fun equals(other: Any?): Boolean {
@@ -35,5 +34,5 @@ enum class Color {
     BLUE,
     RED,
     VIOLET,
-    PINK
+    PINK;
 }
