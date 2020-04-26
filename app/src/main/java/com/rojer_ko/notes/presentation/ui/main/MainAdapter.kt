@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.rojer_ko.notes.R
 import com.rojer_ko.notes.data.model.Color
 import com.rojer_ko.notes.data.model.Note
+import com.rojer_ko.notes.presentation.extensions.getColorInt
+import kotlinx.android.extensions.LayoutContainer
 
 class MainAdapter(private val onItemClickListener: OnItemClickListener)
     : RecyclerView.Adapter<MainAdapter.NoteViewHolder>() {
@@ -31,25 +33,15 @@ class MainAdapter(private val onItemClickListener: OnItemClickListener)
 
     }
 
-
-    inner class NoteViewHolder(itemViev: View) : RecyclerView.ViewHolder(itemViev) {
-        private val title = itemViev.findViewById<TextView>(R.id.title)
-        private val body = itemViev.findViewById<TextView>(R.id.body)
-
+    inner class NoteViewHolder(override val containerView: View) :
+        RecyclerView.ViewHolder(containerView), LayoutContainer {
+        private val title = containerView.findViewById<TextView>(R.id.title)
+        private val body = containerView.findViewById<TextView>(R.id.body)
         fun bind(note: Note) {
             title.text = note.title
             body.text = note.note
-            val color = when (note.color) {
-                Color.WHITE -> R.color.color_white
-                Color.VIOLET -> R.color.color_violet
-                Color.YELLOW -> R.color.color_yello
-                Color.RED -> R.color.color_red
-                Color.PINK -> R.color.color_pink
-                Color.GREEN -> R.color.color_green
-                Color.BLUE -> R.color.color_blue
-            }
-
-            itemView.setBackgroundColor(itemView.context.resources.getColor(color))
+            itemView.setBackgroundColor(note.color.getColorInt(itemView.context))
+            //itemView.setOnClickListener { onItemClickListener(note) }
             itemView.setOnClickListener { onItemClickListener.onItemClick(note) }
         }
     }

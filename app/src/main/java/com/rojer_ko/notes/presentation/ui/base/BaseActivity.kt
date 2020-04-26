@@ -4,8 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.firebase.ui.auth.AuthUI
@@ -18,13 +16,13 @@ private const val RC_SIGN_IN = 458
 
 abstract class BaseActivity<T, S : BaseViewState<T>> : AppCompatActivity() {
 
-    abstract val viewModel: BaseViewModel<T, S>
+    abstract val model: BaseViewModel<T, S>
     abstract val layoutRes: Int
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(layoutRes)
-        viewModel.getViewState().observe(this, Observer<S> { t ->
+        model.getViewState().observe(this, Observer { t ->
             t?.apply {
                 data?.let { renderData(it) }
                 error?.let { renderError(it) }
@@ -32,14 +30,13 @@ abstract class BaseActivity<T, S : BaseViewState<T>> : AppCompatActivity() {
         })
     }
 
-    protected fun renderError(error: Throwable) {
+    private fun renderError(error: Throwable) {
         when(error) {
             is NoAuthException -> startLoginActivity()
             else -> error.message?.let { showError(it) }
         }
 
     }
-
 
     private fun startLoginActivity() {
         val providers = listOf(
@@ -59,7 +56,7 @@ abstract class BaseActivity<T, S : BaseViewState<T>> : AppCompatActivity() {
 
     abstract fun renderData(data: T)
 
-    protected fun showError(error: String) {
+    private fun showError(error: String) {
         Snackbar.make(mainRecycler, error, Snackbar.LENGTH_INDEFINITE).apply {
             setAction(R.string.ok_bth_title) { dismiss() }
             show()
