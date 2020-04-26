@@ -1,8 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
 
 android {
@@ -25,6 +23,10 @@ android {
     }
 }
 
+androidExtensions {
+    experimental = true
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -43,6 +45,9 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-auth:6.2.1'
 
     implementation 'com.android.support:multidex:1.0.3'
+
+    implementation 'org.koin:koin-android:1.0.1'
+    implementation 'org.koin:koin-android-viewmodel:1.0.1'
 
     annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.3.0-alpha01'
     implementation 'androidx.cardview:cardview:1.0.0'

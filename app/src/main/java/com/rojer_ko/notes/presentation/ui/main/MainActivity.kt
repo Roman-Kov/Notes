@@ -1,15 +1,11 @@
 package com.rojer_ko.notes.presentation.ui.main
 
-import MainViewModel
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import android.view.View
-import androidx.lifecycle.ViewModelProviders
 import com.firebase.ui.auth.AuthUI
 import com.rojer_ko.notes.R
 import com.rojer_ko.notes.data.model.Note
@@ -17,6 +13,7 @@ import com.rojer_ko.notes.presentation.ui.base.BaseActivity
 import com.rojer_ko.notes.presentation.ui.note.NoteActivity
 import com.rojer_ko.notes.presentation.ui.splash.SplashActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import org.koin.android.viewmodel.ext.android.viewModel
 
 class MainActivity : BaseActivity<List<Note>?, MainViewState>(), LogoutDialog.LogoutListener {
 
@@ -24,8 +21,9 @@ class MainActivity : BaseActivity<List<Note>?, MainViewState>(), LogoutDialog.Lo
         fun getStartIntent(context: Context) = Intent(context, MainActivity::class.java)
     }
 
-    override val viewModel: MainViewModel by lazy { ViewModelProviders.of(this).get(MainViewModel::class.java) }
-    override val layoutRes: Int = com.rojer_ko.notes.R.layout.activity_main
+    //override val viewModel: com.rojer_ko.notes.presentation.ui.main.MainViewModel by lazy { ViewModelProviders.of(this).get(com.rojer_ko.notes.presentation.ui.main.MainViewModel::class.java) }
+    override val model: MainViewModel by viewModel()
+    override val layoutRes: Int = R.layout.activity_main
     private lateinit var adapter: MainAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,11 +37,7 @@ class MainActivity : BaseActivity<List<Note>?, MainViewState>(), LogoutDialog.Lo
         })
         mainRecycler.adapter = adapter
 
-        fab.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                openNoteScreen(null)
-            }
-        })
+        fab.setOnClickListener { openNoteScreen(null) }
     }
 
     override fun onLogout() {

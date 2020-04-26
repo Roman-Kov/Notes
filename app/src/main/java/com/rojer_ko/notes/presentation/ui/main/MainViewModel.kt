@@ -1,15 +1,16 @@
+package com.rojer_ko.notes.presentation.ui.main
+
 import androidx.lifecycle.Observer
 import com.rojer_ko.notes.data.model.Note
-import com.rojer_ko.notes.data.model.NoteResult
-import com.rojer_ko.notes.data.model.NoteResult.*
+import com.rojer_ko.notes.data.model.Result
+import com.rojer_ko.notes.data.model.Result.*
 import com.rojer_ko.notes.data.repository.Repository
 import com.rojer_ko.notes.presentation.ui.base.BaseViewModel
-import com.rojer_ko.notes.presentation.ui.main.MainViewState
 
-class MainViewModel(val repository: Repository = Repository) : BaseViewModel<List<Note>?, MainViewState>() {
+class MainViewModel(val repository: Repository) : BaseViewModel<List<Note>?, MainViewState>() {
 
-    private val notesObserver = object : Observer<NoteResult> {//Стандартный обсервер LiveData
-    override fun onChanged(t: NoteResult?) {
+    private val notesObserver = object : Observer<Result> {//Стандартный обсервер LiveData
+    override fun onChanged(t: Result?) {
         if (t == null) return
 
         when(t) {
